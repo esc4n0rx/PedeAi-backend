@@ -13,6 +13,7 @@ import { handleStripeWebhook } from "./controllers/webhook.controller.js"
 import { globalRateLimiter, authRateLimiter } from "./middlewares/rateLimiter.js";
 import storeRoutes from './routes/store.routes.js';
 import { validateEnv } from "./utils/validateEnv.js";
+import productRoutes from './routes/product.routes.js';
 import bodyParser from 'body-parser'
 
 dotenv.config()
@@ -46,6 +47,7 @@ app.use('/auth', authRateLimiter, authRoutes);
 app.use('/perfil', profileRoutes)
 app.use('/subscribe', subscribeRoutes)
 app.use('/store', storeRoutes);
+app.use('/products', productRoutes);
 
 app.use(errorHandler)
 
