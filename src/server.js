@@ -11,6 +11,7 @@ import profileRoutes from "../src/routes/profile.routes.js"
 import subscribeRoutes from "../src/routes/subscribe.routes.js"
 import { handleStripeWebhook } from "./controllers/webhook.controller.js"
 import { globalRateLimiter, authRateLimiter } from "./middlewares/rateLimiter.js";
+import storeRoutes from './routes/store.routes.js';
 import { validateEnv } from "./utils/validateEnv.js";
 import bodyParser from 'body-parser'
 
@@ -44,6 +45,7 @@ app.use('/register', authRateLimiter, registerRoutes)
 app.use('/auth', authRateLimiter, authRoutes);
 app.use('/perfil', profileRoutes)
 app.use('/subscribe', subscribeRoutes)
+app.use('/store', storeRoutes);
 
 app.use(errorHandler)
 
