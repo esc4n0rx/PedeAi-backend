@@ -9,5 +9,3 @@ export const registerSchema = z.object({
   telefone: z.string().optional(),
   endereco: z.string().optional()
 })
-
-export type RegisterInput = z.infer<typeof registerSchema>

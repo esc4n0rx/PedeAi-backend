@@ -2,8 +2,8 @@
 import request from 'supertest'
 import { describe, it, expect } from 'vitest'
 import express from 'express'
-import registerRoutes from '../routes/register.routes'
-import { errorHandler } from '../middlewares/errorHandler'
+import registerRoutes from "../routes/register.routes.js"
+import { errorHandler } from "../middlewares/errorHandler.js"
 
 const app = express()
 app.use(express.json())

@@ -2,10 +2,10 @@ import request from 'supertest'
 import express from 'express'
 import { describe, it, expect, beforeAll } from 'vitest'
 
-import registerRoutes from '../routes/register.routes'
-import loginRoutes from '../routes/login.routes'
-import profileRoutes from '../routes/profile.routes'
-import { errorHandler } from '../middlewares/errorHandler'
+import registerRoutes from "../routes/register.routes.js"
+import loginRoutes from "../routes/login.routes.js"
+import profileRoutes from "../routes/profile.routes.js"
+import { errorHandler } from "../middlewares/errorHandler.js"
 import dotenv from 'dotenv'
 
 dotenv.config()
