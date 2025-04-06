@@ -1,4 +1,4 @@
-// src/tests/plan-limits.test.js
+
 import request from 'supertest';
 import express from 'express';
 import { describe, it, expect, beforeAll } from 'vitest';
@@ -12,8 +12,7 @@ import productRoutes from "../routes/product.routes.js";
 import planRoutes from "../routes/plan.routes.js";
 import { errorHandler } from "../middlewares/errorHandler.js";
 
-// Mock simples para substituir a função de criptografia
-// Isso evita os problemas com crypto-js durante os testes
+
 import { vi } from 'vitest';
 vi.mock('../utils/encryption.js', () => ({
   encrypt: (data) => `encrypted-${data}`,
@@ -22,7 +21,6 @@ vi.mock('../utils/encryption.js', () => ({
 
 dotenv.config();
 
-// Criar instância do app Express para testes
 const app = express();
 app.use(express.json());
 app.use('/register', registerRoutes);
@@ -32,7 +30,7 @@ app.use('/products', productRoutes);
 app.use('/plans', planRoutes);
 app.use(errorHandler);
 
-// Variáveis para armazenar dados durante o teste
+
 let token = '';
 let storeId = '';
 const testUser = {
@@ -45,7 +43,7 @@ const testUser = {
 };
 
 describe('Teste de Limites de Plano', () => {
-  // Passo 1: Registrar um novo usuário
+
   it('deve registrar um novo usuário para o teste', async () => {
     const res = await request(app)
       .post('/register')

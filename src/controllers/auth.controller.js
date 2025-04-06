@@ -1,4 +1,3 @@
-// src/controllers/auth.controller.ts
 import { refreshAccessToken, logout } from "../services/auth.service.js";
 
 export const refreshToken = async (req, res, next) => {

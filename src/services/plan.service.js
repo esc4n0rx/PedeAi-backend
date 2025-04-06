@@ -1,4 +1,79 @@
-// src/services/plan.service.js
+// Arquivo: src/services/plan.service.js
+// Este arquivo contém a lógica de gerenciamento de planos e suas limitações no sistema
+
+/*
+PLAN_LIMITS: Objeto que define as características e limitações de cada plano
+- Cada plano possui:
+  * maxProducts: Número máximo de produtos permitidos
+  * maxCategories: Número máximo de categorias permitidas
+  * features: Array com as funcionalidades disponíveis
+  * description: Descrição em português do plano
+
+Planos disponíveis:
+1. free/plan-free: Plano básico gratuito
+   - 10 produtos
+   - 3 categorias
+   - Funcionalidades: loja básica e integração WhatsApp
+
+2. plan-vitrine: Plano intermediário inicial
+   - 20 produtos
+   - 5 categorias
+   - Adiciona: link personalizado, suporte básico, tema básico personalizado
+
+3. plan-prateleira: Plano intermediário avançado
+   - 50 produtos
+   - 10 categorias
+   - Adiciona: suporte premium, relatórios básicos, integração de pagamento,
+     tema avançado, cupons e promoções
+
+4. plan-mercado: Plano mais completo
+   - Produtos ilimitados
+   - Categorias ilimitadas
+   - Acesso a todas as funcionalidades
+*/
+
+/*
+Principais funções do serviço:
+
+1. getUserPlanLimits(userId)
+   - Verifica o plano atual do usuário no banco
+   - Valida se o plano está expirado
+   - Reverte para plano gratuito se necessário
+   - Retorna os limites do plano atual
+
+2. checkProductLimit(userId, storeId)
+   - Verifica se o usuário pode criar mais produtos
+   - Compara quantidade atual com o limite do plano
+   - Retorna informações sobre o limite e possibilidade de criação
+
+3. checkCategoryLimit(userId, storeId)
+   - Similar ao checkProductLimit, mas para categorias
+   - Verifica limites de criação de categorias do plano
+
+4. hasFeatureAccess(userId, feature)
+   - Verifica se o usuário tem acesso a uma funcionalidade específica
+   - Considera planos com acesso total ('all') ou feature específica
+
+5. getUserPlanInfo(userId)
+   - Retorna informações detalhadas sobre o plano do usuário
+   - Inclui status de ativação, dias restantes
+   - Fornece limites e funcionalidades disponíveis
+
+6. getPlanNameFromLimits(planLimits)
+   - Função auxiliar interna
+   - Identifica o nome do plano baseado nos limites configurados
+*/
+
+/*
+Observações importantes:
+1. O sistema possui tratamento de erros robusto com try/catch
+2. Logs de erro são mantidos para debugging
+3. Existe verificação automática de expiração de planos
+4. Sistema fallback para plano gratuito em caso de erros
+5. Integração com Supabase para persistência dos dados
+*/
+
+
 import { supabase } from "../config/supabase.js";
 
 export const PLAN_LIMITS = {
@@ -51,7 +126,6 @@ export const PLAN_LIMITS = {
  */
 export async function getUserPlanLimits(userId) {
   try {
-    // Buscar plano do usuário
     const { data, error } = await supabase
       .from('users')
       .select('plan_active, plan_expire_at')
@@ -60,17 +134,17 @@ export async function getUserPlanLimits(userId) {
     
     if (error) throw new Error('Erro ao verificar plano do usuário');
     
-    // Verificar se o plano expirou
+
     if (data.plan_active && data.plan_active !== 'plan-free' && data.plan_expire_at) {
       const now = new Date();
       const expireDate = new Date(data.plan_expire_at);
       
       if (now > expireDate) {
-        // Plano expirado, voltar para free
+
         await supabase
           .from('users')
           .update({ 
-            plan_active: 'free',
+            plan_active: 'plan-free',
             plan_expire_at: null
           })
           .eq('id', userId);
@@ -84,7 +158,6 @@ export async function getUserPlanLimits(userId) {
     return PLAN_LIMITS[planName] || PLAN_LIMITS['plan-free'];
   } catch (err) {
     console.error('Erro ao obter limites do plano:', err);
-    // Em caso de erro, retornar plano gratuito por segurança
     return PLAN_LIMITS['plan-free'];
   }
 }
@@ -98,8 +171,8 @@ export async function getUserPlanLimits(userId) {
 export async function checkProductLimit(userId, storeId) {
   try {
     const planLimits = await getUserPlanLimits(userId);
-    
-    // Contar produtos atuais
+  
+
     const { count, error } = await supabase
       .from('products')
       .select('id', { count: 'exact', head: true })
@@ -129,7 +202,6 @@ export async function checkCategoryLimit(userId, storeId) {
   try {
     const planLimits = await getUserPlanLimits(userId);
     
-    // Contar categorias atuais
     const { count, error } = await supabase
       .from('product_categories')
       .select('id', { count: 'exact', head: true })
@@ -161,7 +233,7 @@ export async function hasFeatureAccess(userId, feature) {
     return planLimits.features.includes('all') || planLimits.features.includes(feature);
   } catch (err) {
     console.error('Erro ao verificar acesso à funcionalidade:', err);
-    return false; // Em caso de erro, negar acesso por segurança
+    return false;
   }
 }
 

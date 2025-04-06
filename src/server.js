@@ -1,4 +1,3 @@
-// src/server.js (atualizado para incluir Swagger)
 import express from 'express'
 import dotenv from 'dotenv'
 import morgan from 'morgan'
@@ -15,7 +14,7 @@ import storeRoutes from './routes/store.routes.js';
 import { validateEnv } from "./utils/validateEnv.js";
 import productRoutes from './routes/product.routes.js';
 import bodyParser from 'body-parser'
-import { setupSwagger } from './config/swagger.js'; // Importar configuração Swagger
+import { setupSwagger } from './config/swagger.js'; 
 
 dotenv.config()
 
@@ -44,7 +43,6 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      // Relaxar CSP para o Swagger UI funcionar
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:"],

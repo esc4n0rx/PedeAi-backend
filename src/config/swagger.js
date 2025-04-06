@@ -1,8 +1,3 @@
-// 1. Instale as dependências necessárias:
-// npm install swagger-jsdoc swagger-ui-express
-
-// 2. Crie o arquivo src/config/swagger.js:
-
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 

@@ -1,4 +1,3 @@
-// src/config/jwt.js
 
 export const jwtConfig = {
   access: {

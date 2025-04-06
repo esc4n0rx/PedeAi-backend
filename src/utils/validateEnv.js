@@ -1,4 +1,3 @@
-// src/utils/validateEnv.ts
 import dotenv from 'dotenv'
 
 dotenv.config()

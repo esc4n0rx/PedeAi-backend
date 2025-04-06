@@ -1,4 +1,3 @@
-// src/validators/store.validator.js
 import { z } from 'zod';
 
 export const storeSchema = z.object({

@@ -1,16 +1,16 @@
-// src/services/auth.service.js
+
 import { jwtConfig } from "../config/jwt.js";
 import { supabase } from "../config/supabase.js";
 import { compare } from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
-// Criar uma função helper para lidar com a assinatura JWT
+
 function createToken(payload, secret, options) {
   return jwt.sign(payload, secret, options);
 }
 
-// Função auxiliar para verificação de token
+
 function verifyToken(token, secret) {
   return jwt.verify(token, secret);
 }
@@ -33,21 +33,21 @@ export async function login(email, senha) {
     throw new Error('Usuário ou senha inválidos');
   }
 
-  // Gerar access token usando a função helper
+  
   const accessToken = createToken(
     { id: user.id, email: user.email },
     jwtConfig.access.secret,
     { expiresIn: jwtConfig.access.expiresIn }
   );
 
-  // Gerar refresh token usando a função helper
+  
   const refreshToken = createToken(
     { id: user.id, tokenVersion: uuidv4() },
     jwtConfig.refresh.secret,
     { expiresIn: jwtConfig.refresh.expiresIn }
   );
 
-  // Armazenar refresh token no banco
+  
   await supabase
     .from('refresh_tokens')
     .insert({
@@ -70,10 +70,8 @@ export async function login(email, senha) {
 
 export async function refreshAccessToken(refreshToken) {
   try {
-    // Verificar se o refresh token é válido usando a função helper
     const decoded = verifyToken(refreshToken, jwtConfig.refresh.secret);
     
-    // Verificar se o token existe no banco e não foi revogado
     const { data, error } = await supabase
       .from('refresh_tokens')
       .select('*')
@@ -85,7 +83,6 @@ export async function refreshAccessToken(refreshToken) {
       throw new Error('Refresh token inválido');
     }
     
-    // Verificar se o token expirou
     if (new Date(data.expires_at) < new Date()) {
       throw new Error('Refresh token expirado');
     }
@@ -101,7 +98,6 @@ export async function refreshAccessToken(refreshToken) {
       throw new Error('Usuário não encontrado');
     }
     
-    // Gerar novo access token usando a função helper
     const accessToken = createToken(
       { id: userData.id, email: userData.email },
       jwtConfig.access.secret,
@@ -118,7 +114,7 @@ export async function refreshAccessToken(refreshToken) {
       }
     };
   } catch (error) {
-    // Detalhamento do erro para facilitar o diagnóstico
+    
     console.error('Erro ao renovar token:', error);
     if (error.name === 'JsonWebTokenError') {
       throw new Error('Token inválido: ' + error.message);
@@ -131,7 +127,6 @@ export async function refreshAccessToken(refreshToken) {
 }
 
 export async function logout(userId, refreshToken) {
-  // Remover o refresh token do banco de dados
   const { error } = await supabase
     .from('refresh_tokens')
     .delete()

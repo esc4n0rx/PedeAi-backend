@@ -1,4 +1,4 @@
-// src/config/stripe.ts
+
 import Stripe from 'stripe'
 import dotenv from 'dotenv'
 
