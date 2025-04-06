@@ -10,6 +10,8 @@ import profileRoutes from "../src/routes/profile.routes.js"
 import planRoutes from "./routes/plan.routes.js"
 import { handleStripeWebhook } from "./controllers/webhook.controller.js"
 import { globalRateLimiter, authRateLimiter } from "./middlewares/rateLimiter.js";
+import uploadRoutes from './routes/upload.routes.js';
+import orderRoutes from './routes/order.routes.js';
 import storeRoutes from './routes/store.routes.js';
 import { validateEnv } from "./utils/validateEnv.js";
 import productRoutes from './routes/product.routes.js';
@@ -56,9 +58,11 @@ setupSwagger(app);
 
 app.use('/register', authRateLimiter, registerRoutes)
 app.use('/auth', authRateLimiter, authRoutes);
+app.use('/orders', orderRoutes);
 app.use('/perfil', profileRoutes)
 app.use('/plans', planRoutes)
 app.use('/store', storeRoutes);
+app.use('/upload', uploadRoutes);
 app.use('/products', productRoutes);
 
 app.use(errorHandler)

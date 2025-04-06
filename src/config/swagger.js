@@ -212,6 +212,272 @@ const options = {
             }
           }
         },
+        Order: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID único do pedido'
+            },
+            store_id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID da loja'
+            },
+            customer_id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID do cliente'
+            },
+            address_id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID do endereço de entrega'
+            },
+            coupon_id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID do cupom aplicado (se houver)'
+            },
+            status: {
+              type: 'string',
+              enum: ['em_processamento', 'em_preparacao', 'em_rota', 'finalizado', 'cancelado', 'recusado'],
+              description: 'Status atual do pedido'
+            },
+            payment_method: {
+              type: 'string',
+              enum: ['pix', 'cartao', 'dinheiro'],
+              description: 'Método de pagamento'
+            },
+            payment_status: {
+              type: 'string',
+              enum: ['pendente', 'confirmado', 'nao_confirmado'],
+              description: 'Status do pagamento'
+            },
+            payment_proof_url: {
+              type: 'string',
+              format: 'uri',
+              description: 'URL do comprovante de pagamento (para Pix)'
+            },
+            change_for: {
+              type: 'number',
+              format: 'float',
+              description: 'Valor para troco (para dinheiro)'
+            },
+            subtotal: {
+              type: 'number',
+              format: 'float',
+              description: 'Subtotal do pedido (sem descontos e taxas)'
+            },
+            delivery_fee: {
+              type: 'number',
+              format: 'float',
+              description: 'Taxa de entrega'
+            },
+            discount: {
+              type: 'number',
+              format: 'float',
+              description: 'Valor do desconto aplicado'
+            },
+            total: {
+              type: 'number',
+              format: 'float',
+              description: 'Valor total do pedido (subtotal + taxa - desconto)'
+            },
+            notes: {
+              type: 'string',
+              description: 'Observações sobre o pedido'
+            },
+            customer: {
+              $ref: '#/components/schemas/Customer'
+            },
+            address: {
+              $ref: '#/components/schemas/Address'
+            },
+            items: {
+              type: 'array',
+              items: {
+                $ref: '#/components/schemas/OrderItem'
+              }
+            },
+            status_history: {
+              type: 'array',
+              items: {
+                $ref: '#/components/schemas/OrderStatusHistory'
+              }
+            },
+            created_at: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data de criação'
+            },
+            updated_at: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data da última atualização'
+            }
+          }
+        },
+        Customer: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID único do cliente'
+            },
+            store_id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID da loja'
+            },
+            name: {
+              type: 'string',
+              description: 'Nome do cliente'
+            },
+            phone: {
+              type: 'string',
+              description: 'Telefone do cliente'
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              description: 'Email do cliente (opcional)'
+            },
+            created_at: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data de criação'
+            }
+          }
+        },
+        Address: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID único do endereço'
+            },
+            customer_id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID do cliente'
+            },
+            street: {
+              type: 'string',
+              description: 'Nome da rua'
+            },
+            number: {
+              type: 'string',
+              description: 'Número do endereço'
+            },
+            complement: {
+              type: 'string',
+              description: 'Complemento (opcional)'
+            },
+            neighborhood: {
+              type: 'string',
+              description: 'Bairro'
+            },
+            city: {
+              type: 'string',
+              description: 'Cidade'
+            },
+            zip_code: {
+              type: 'string',
+              description: 'CEP'
+            },
+            reference_point: {
+              type: 'string',
+              description: 'Ponto de referência (opcional)'
+            },
+            created_at: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data de criação'
+            },
+            updated_at: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data de atualização'
+            }
+          }
+        },
+        OrderItem: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID único do item'
+            },
+            order_id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID do pedido'
+            },
+            product_id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID do produto'
+            },
+            quantity: {
+              type: 'integer',
+              minimum: 1,
+              description: 'Quantidade do produto'
+            },
+            unit_price: {
+              type: 'number',
+              format: 'float',
+              description: 'Preço unitário do produto'
+            },
+            total_price: {
+              type: 'number',
+              format: 'float',
+              description: 'Preço total do item (quantidade * preço unitário)'
+            },
+            notes: {
+              type: 'string',
+              description: 'Observações sobre o item'
+            },
+            created_at: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data de criação'
+            }
+          }
+        },
+        OrderStatusHistory: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID único do registro'
+            },
+            order_id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID do pedido'
+            },
+            status: {
+              type: 'string',
+              enum: ['em_processamento', 'em_preparacao', 'em_rota', 'finalizado', 'cancelado', 'recusado'],
+              description: 'Status registrado'
+            },
+            notes: {
+              type: 'string',
+              description: 'Observações sobre a mudança de status'
+            },
+            created_at: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data do registro'
+            }
+          }
+        },
         Plan: {
           type: 'object',
           properties: {
