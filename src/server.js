@@ -1,4 +1,4 @@
-// src/server.js
+// src/server.js (atualizado para incluir Swagger)
 import express from 'express'
 import dotenv from 'dotenv'
 import morgan from 'morgan'
@@ -8,13 +8,14 @@ import registerRoutes from "../src/routes/register.routes.js"
 import authRoutes from "./routes/auth.routes.js";
 import { errorHandler } from "../src/middlewares/errorHandler.js"
 import profileRoutes from "../src/routes/profile.routes.js"
-import subscribeRoutes from "../src/routes/subscribe.routes.js"
+import planRoutes from "./routes/plan.routes.js"
 import { handleStripeWebhook } from "./controllers/webhook.controller.js"
 import { globalRateLimiter, authRateLimiter } from "./middlewares/rateLimiter.js";
 import storeRoutes from './routes/store.routes.js';
 import { validateEnv } from "./utils/validateEnv.js";
 import productRoutes from './routes/product.routes.js';
 import bodyParser from 'body-parser'
+import { setupSwagger } from './config/swagger.js'; // Importar configuração Swagger
 
 dotenv.config()
 
@@ -39,13 +40,26 @@ app.use(cors(corsOptions));
 
 app.use(globalRateLimiter);
 app.use(express.json())
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      // Relaxar CSP para o Swagger UI funcionar
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+    },
+  },
+}));
 app.use(morgan('dev'))
+
+// Configurar Swagger
+setupSwagger(app);
 
 app.use('/register', authRateLimiter, registerRoutes)
 app.use('/auth', authRateLimiter, authRoutes);
 app.use('/perfil', profileRoutes)
-app.use('/subscribe', subscribeRoutes)
+app.use('/plans', planRoutes)
 app.use('/store', storeRoutes);
 app.use('/products', productRoutes);
 
@@ -54,4 +68,5 @@ app.use(errorHandler)
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`)
+  console.log(`Documentação Swagger disponível em: http://localhost:${PORT}/api-docs`)
 })

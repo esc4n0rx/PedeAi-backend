@@ -2,7 +2,6 @@
 import CryptoJS from 'crypto-js';
 import dotenv from 'dotenv';
 
-
 dotenv.config();
 
 const SECRET_KEY = process.env.ENCRYPTION_KEY || process.env.JWT_SECRET || '';
