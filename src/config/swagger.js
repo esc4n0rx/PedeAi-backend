@@ -23,8 +23,8 @@ const options = {
         description: 'Servidor de desenvolvimento'
       },
       {
-        url: 'https://api.pedeai.com.br',
-        description: 'Servidor de produção'
+        url: 'https://api.streamhivex.icu/',
+        description: 'Servidor de produção, dominio novo em construção'
       }
     ],
     components: {
