@@ -4,7 +4,7 @@ import {
   customerIdentificationSchema, 
   customerOrderSchema 
 } from "../validators/customer-order.validator.js";
-import { rateLimit } from "../middlewares/rateLimiter.js";
+import rateLimit from 'express-rate-limit';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeData } from "../utils/sanitize.js";
