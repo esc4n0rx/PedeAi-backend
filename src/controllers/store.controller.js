@@ -171,7 +171,53 @@ export const getStoreBySlug = async (req, res, next) => {
 };
 
 
-// Adicione esta função ao arquivo src/controllers/store.controller.js
+export const getStoreProducts = async (req, res, next) => {
+  try {
+    const { storeId } = req.params;
+    
+    // Verificar se a loja existe e está ativa
+    const { data: store, error: storeError } = await supabase
+      .from('stores')
+      .select('id')
+      .eq('id', storeId)
+      .eq('status', 'active')
+      .single();
+    
+    if (storeError || !store) {
+      return res.status(404).json({ error: 'Loja não encontrada ou inativa' });
+    }
+    
+    // Buscar produtos da loja
+    const { data: products, error: productsError } = await supabase
+      .from('products')
+      .select(`
+        id, 
+        name, 
+        description, 
+        price, 
+        discount_price, 
+        image_url, 
+        status,
+        category_id,
+        product_categories(id, name)
+      `)
+      .eq('store_id', storeId)
+      .eq('status', 'active')
+      .order('name');
+    
+    if (productsError) {
+      console.error('Erro ao buscar produtos:', productsError);
+      return res.status(500).json({ error: 'Erro ao buscar produtos' });
+    }
+    
+    res.status(200).json({
+      products: products || []
+    });
+  } catch (err) {
+    console.error('Erro não tratado:', err);
+    next(err);
+  }
+};
 
 export const getProductsByCategory = async (req, res, next) => {
   try {
