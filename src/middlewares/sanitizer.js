@@ -1,18 +1,38 @@
+// src/utils/sanitize.js
+import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 
-import { body, validationResult } from 'express-validator';
-import { Request, Response, NextFunction } from 'express';
+// Criar window virtual para DOMPurify
+const window = new JSDOM('').window;
+const purify = DOMPurify(window);
 
-export const sanitizeUserInput = [
-  body('email').trim().escape(),
-  body('nome').trim(),
-  body('endereco').trim(),
-  body('telefone').trim(),
-  body('cpf_cnpj').trim(),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
+// Sanitizar string
+export const sanitizeString = (str) => {
+  if (!str || typeof str !== 'string') return str;
+  return purify.sanitize(str, { ALLOWED_TAGS: [] }).trim();
+};
+
+// Sanitizar objeto completo recursivamente
+export const sanitizeData = (data) => {
+  if (!data) return data;
+  
+  if (typeof data === 'string') {
+    return sanitizeString(data);
   }
-];
+  
+  if (Array.isArray(data)) {
+    return data.map(item => sanitizeData(item));
+  }
+  
+  if (typeof data === 'object' && data !== null) {
+    const result = {};
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
+        result[key] = sanitizeData(data[key]);
+      }
+    }
+    return result;
+  }
+  
+  return data;
+};

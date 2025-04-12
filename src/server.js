@@ -16,8 +16,13 @@ import orderRoutes from './routes/order.routes.js';
 import storeRoutes from './routes/store.routes.js';
 import { validateEnv } from "./utils/validateEnv.js";
 import productRoutes from './routes/product.routes.js';
+import publicRoutes from './routes/public.routes.js';
 import bodyParser from 'body-parser'
 import { setupSwagger } from './config/swagger.js'; 
+import { securityMonitoring } from './utils/securityLogger.js';
+import { publicApiLimiter } from './middlewares/advancedRateLimit.js';
+
+
 
 dotenv.config()
 
@@ -31,27 +36,40 @@ app.post(
 )
 
 const corsOptions = {
-    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://pedai-frontend.vercel.app'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-    maxAge: 86400
+  origin: process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(',') 
+    : ['https://pedeai.com.br'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  maxAge: 86400
 };
+app.use(cors(corsOptions));
   
 app.use(cors(corsOptions));
 
 app.use(globalRateLimiter);
-app.use(express.json())
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:"],
+      imgSrc: ["'self'", "data:", "https://*.cloudinary.com"],
     },
   },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  }
 }));
+app.use(securityMonitoring);
+app.disable('x-powered-by');
+
 app.use(morgan('dev'))
 
 // Configurar Swagger
@@ -59,6 +77,7 @@ setupSwagger(app);
 
 app.use('/register', authRateLimiter, registerRoutes)
 app.use('/auth', authRateLimiter, authRoutes);
+app.use('/public', globalRateLimiter, publicRoutes,publicApiLimiter);
 app.use('/dashboard', dashboardRoutes);
 app.use('/orders', orderRoutes);
 app.use('/perfil', profileRoutes)

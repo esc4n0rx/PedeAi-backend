@@ -9,5 +9,6 @@ export const storeSchema = z.object({
   banner_url: z.string().url("URL do banner inválida").optional(),
   theme: z.string().default("default"),
   payment_methods: z.array(z.string()).default(["dinheiro", "cartão"]),
-  business_hours: z.record(z.string(), z.string()).optional()
+  business_hours: z.record(z.string(), z.string()).optional(),
+  slug: z.string().regex(/^[a-z0-9-]+$/i, "Slug deve conter apenas letras, números e hífens").optional()
 });

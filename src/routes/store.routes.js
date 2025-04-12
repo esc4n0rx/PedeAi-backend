@@ -279,4 +279,7 @@ router.put('/', updateStore);
  */
 router.patch('/status', toggleStoreStatus);
 
+
+router.get('/check-slug/:slug', checkSlugAvailability);
+
 export default router;
