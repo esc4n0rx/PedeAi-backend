@@ -171,6 +171,58 @@ export const getStoreBySlug = async (req, res, next) => {
 };
 
 
+// Adicione esta função ao arquivo src/controllers/store.controller.js
+
+export const getProductsByCategory = async (req, res, next) => {
+  try {
+    const { storeId, categoryId } = req.params;
+    
+    // Verificar se a loja existe e está ativa
+    const { data: store, error: storeError } = await supabase
+      .from('stores')
+      .select('id')
+      .eq('id', storeId)
+      .eq('status', 'active')
+      .single();
+    
+    if (storeError || !store) {
+      return res.status(404).json({ error: 'Loja não encontrada ou inativa' });
+    }
+    
+    // Verificar se a categoria existe
+    const { data: category, error: categoryError } = await supabase
+      .from('product_categories')
+      .select('id, name')
+      .eq('id', categoryId)
+      .eq('store_id', storeId)
+      .single();
+    
+    if (categoryError || !category) {
+      return res.status(404).json({ error: 'Categoria não encontrada' });
+    }
+    
+    // Buscar produtos da categoria
+    const { data: products, error: productsError } = await supabase
+      .from('products')
+      .select('id, name, description, price, discount_price, image_url, status, category_id')
+      .eq('store_id', storeId)
+      .eq('category_id', categoryId)
+      .eq('status', 'active');
+    
+    if (productsError) {
+      return res.status(500).json({ error: 'Erro ao buscar produtos' });
+    }
+    
+    res.status(200).json({
+      category: category,
+      products: products || []
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
 
 export const checkSlugAvailability = async (req, res, next) => {
   try {
