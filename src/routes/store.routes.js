@@ -1,6 +1,6 @@
 // src/routes/store.routes.js
 import { Router } from 'express';
-import { createStore, getStore, updateStore, toggleStoreStatus } from '../controllers/store.controller.js';
+import { createStore, getStore, updateStore, toggleStoreStatus,checkSlugAvailability } from '../controllers/store.controller.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = Router();
